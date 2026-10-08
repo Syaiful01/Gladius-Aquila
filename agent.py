@@ -10,9 +10,13 @@ from datetime import timedelta
 from character.persona import Persona
 from config import Config
 from data.crypto_scanner import CoinSignal, SignalType, scan_market
+from data.fast_news_loop import FastNewsLoop
+from data.futures_data import FuturesDataClient
 from data.gold_news import GoldNewsMonitor, NewsCheckResult
 from data.market_data import MarketDataClient
+from data.signal_store import SignalStore
 from notifications.telegram_bot import TelegramNotifier
+from notifications.telegram_commands import TelegramCommandHandler
 from utils.helpers import utc_now
 from utils.logger import get_logger
 
@@ -39,13 +43,29 @@ class GladiusAquila:
         self._notifier = TelegramNotifier(config, self._persona, dry_run=dry_run)
         self._market = MarketDataClient(config)
         self._news = GoldNewsMonitor(config) if config.news_enabled else None
+        self._signal_store = SignalStore()
+        self._futures = FuturesDataClient()
 
         self._cycle = 0
         self._last_report_at = None
+        self._last_scan_at = None
         self._alert_history: dict[str, object] = {}   # "SYMBOL|TYPE" -> waktu alert terakhir
         self._news_sent: set[str] = set()              # "event_id|pre|post"
         self._error_history: dict[str, object] = {}    # konteks -> waktu error terakhir dikirim
         self._stop = threading.Event()
+
+        # Komponen tambahan (Fase 1)
+        self._cmd_handler = TelegramCommandHandler(config, self._persona, self)
+        self._fast_news: FastNewsLoop | None = (
+            FastNewsLoop(
+                config=config,
+                persona=self._persona,
+                notifier=self._notifier,
+                news_monitor=self._news,
+                news_sent_registry=self._news_sent,
+            )
+            if self._news is not None else None
+        )
 
     # ------------------------------------------------------------------
     # Siklus utama
@@ -58,6 +78,9 @@ class GladiusAquila:
 
         try:
             result.signals = scan_market(self._market, self._cfg)
+            # Fase 2: Simpan sinyal ke SQLite
+            if result.signals:
+                self._signal_store.save_many(result.signals)
         except Exception as exc:
             self._handle_error("pemindaian crypto", exc)
 
@@ -73,6 +96,7 @@ class GladiusAquila:
         if force_report or self._report_due():
             result.report_sent = self._send_report(result)
 
+        self._last_scan_at = utc_now()
         logger.info("=== Siklus #%d selesai (alert: %d, laporan: %s) ===",
                     self._cycle, result.alerts_sent, result.report_sent)
         return result
@@ -81,6 +105,17 @@ class GladiusAquila:
         """Loop 24 jam sampai menerima SIGINT/SIGTERM (Ctrl+C / systemctl stop)."""
         self._install_signal_handlers()
         self._notifier.send_alert(self._persona.online(self._cfg.scan_interval_minutes))
+
+        # Fase 1: Mulai command handler dan fast news loop
+        self._cmd_handler.start()
+        if self._fast_news:
+            self._fast_news.start()
+
+        # Purge sinyal lama sekali saat startup
+        try:
+            self._signal_store.purge_old(keep_days=30)
+        except Exception as exc:
+            logger.warning("Purge signal store gagal: %s", exc)
 
         while not self._stop.is_set():
             started = time.monotonic()
@@ -92,6 +127,10 @@ class GladiusAquila:
             logger.info("Patroli berikutnya dalam %.0f detik.", wait)
             self._stop.wait(wait)
 
+        # Shutdown berurutan
+        self._cmd_handler.stop()
+        if self._fast_news:
+            self._fast_news.stop()
         self._notifier.send_alert(self._persona.shutdown())
         logger.info("Gladius Aquila berhenti dengan tertib.")
 
@@ -184,3 +223,14 @@ class GladiusAquila:
             signal.signal(signal.SIGTERM, _handler)
         except ValueError:  # bukan di main thread
             logger.debug("Signal handler tidak dipasang (bukan main thread).")
+
+    # ------------------------------------------------------------------
+    # Akses publik untuk web & command handler
+    # ------------------------------------------------------------------
+    @property
+    def signal_store(self) -> SignalStore:
+        return self._signal_store
+
+    @property
+    def futures_client(self) -> FuturesDataClient:
+        return self._futures

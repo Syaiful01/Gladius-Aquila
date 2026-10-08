@@ -20,161 +20,261 @@
         <div class="brand-sub">AI TRADING RESEARCH COMMAND CENTER</div>
       </div>
     </div>
-    
+
     <div class="header-status">
+      <div id="wsIndicator" class="ws-indicator offline" title="WebSocket Status">WS</div>
       <div id="patrolStatusBadge" class="status-badge standby">
         <span class="pulse-dot"></span> STANDBY
       </div>
     </div>
   </header>
 
-  <!-- Main Grid -->
-  <main class="dashboard-grid">
-    
-    <!-- Left Column: Agent Hub (Avatar + Dialogue + Control) -->
-    <section class="panel agent-hub">
-      <div class="panel-header" style="width: 100%;">
-        <div class="panel-title">
-          <span>🛡️</span> Gladius Aquila (AI Agent)
-        </div>
-      </div>
+  <!-- Tab Navigation -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="dashboard">📡 Dashboard</button>
+    <button class="tab-btn" data-tab="history">📜 Riwayat Sinyal</button>
+    <button class="tab-btn" data-tab="futures">⚡ Funding Rate</button>
+  </nav>
 
-      <!-- Cybernetic Eagle Avatar Visual -->
-      <div class="avatar-container">
-        <div class="avatar-ring"></div>
-        <div class="avatar-ring-2"></div>
-        
-        <div id="eagleGraphic" class="avatar-graphic">
-          <!-- Cyber Eagle SVG Artwork -->
-          <svg class="eagle-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="armorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#38bdf8" />
-                <stop offset="100%" stop-color="#0284c7" />
-              </linearGradient>
-              <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fde047" />
-                <stop offset="100%" stop-color="#eab308" />
-              </linearGradient>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="2" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
+  <!-- ===== TAB: DASHBOARD ===== -->
+  <div id="tab-dashboard" class="tab-content active">
+    <main class="dashboard-grid">
 
-            <!-- Cybernetic Crest Feathers (Helmet / Crown) -->
-            <path d="M50 8 L54 22 L62 14 L58 28 L70 24 L62 36 L50 26 L38 36 L30 24 L42 28 L38 14 L46 22 Z" fill="url(#goldGrad)" filter="url(#glow)" />
-            
-            <!-- Head Armor / Titanium Plating -->
-            <path d="M50 25 C65 25 74 35 72 52 C70 65 62 72 50 82 C38 72 30 65 28 52 C26 35 35 25 50 25 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            
-            <!-- Cyber Visor / Tactical Optics (Cyan Glow) -->
-            <path d="M35 44 Q50 48 65 44 L63 52 Q50 56 37 52 Z" fill="#00f0ff" opacity="0.9" filter="url(#glow)" />
-            
-            <!-- Eagle Eyes (Glowing Amber/Red Optics) -->
-            <polygon points="41,46 47,48 43,50" fill="#ffffff" />
-            <polygon points="59,46 53,48 57,50" fill="#ffffff" />
-            <circle cx="44" cy="48" r="1.5" fill="#ef4444" filter="url(#glow)" />
-            <circle cx="56" cy="48" r="1.5" fill="#ef4444" filter="url(#glow)" />
-
-            <!-- Golden Sharp Beak (Apex Predator) -->
-            <path d="M46 54 Q50 55 54 54 L52 74 Q50 82 48 74 Z" fill="url(#goldGrad)" stroke="#ca8a04" stroke-width="0.75" />
-            
-            <!-- Neck Tactical Collar Plates -->
-            <path d="M32 68 L50 85 L68 68 L72 82 L50 96 L28 82 Z" fill="#0f172a" stroke="url(#armorGrad)" stroke-width="1.2" />
-            <line x1="50" y1="85" x2="50" y2="96" stroke="#00f0ff" stroke-width="1.5" filter="url(#glow)" />
-          </svg>
-        </div>
-      </div>
-
-      <div class="agent-badge-tag">ELITE RESEARCH OPERATOR</div>
-
-      <!-- Speech Bubble -->
-      <div class="speech-bubble">
-        <div class="speech-speaker">
-          <span>🦅</span> Gladius Aquila:
-        </div>
-        <div id="speechText">
-          Boss, Gladius Aquila standby di Tactical Command Center. Siap memindai radar pasar crypto dan berita ekonomi XAUUSD.
-        </div>
-      </div>
-
-      <!-- Control Buttons -->
-      <div class="action-grid">
-        <button id="btnScanNow" class="btn btn-primary">
-          <span>🚀</span> Pindai Radar Sekarang
-        </button>
-        <button id="btnTogglePatrol" class="btn btn-patrol">
-          <span>🛡️</span> Aktifkan Patroli 24 Jam
-        </button>
-        <button id="btnTestTelegram" class="btn btn-telegram">
-          <span>📲</span> Tes Notifikasi Telegram
-        </button>
-      </div>
-    </section>
-
-    <!-- Right Column: Telemetry, Signals, News, Logs -->
-    <div class="content-area">
-      
-      <!-- Metrics Strip -->
-      <div class="metrics-strip">
-        <div class="metric-card">
-          <div class="metric-label">Total Siklus</div>
-          <div id="cycleCount" class="metric-value">#0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Waktu Scan Terakhir</div>
-          <div id="lastScanTime" class="metric-value">--:--:--</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Harga Emas Proksi (PAXG)</div>
-          <div id="goldPrice" class="metric-value" style="color: var(--gold-neon);">$---</div>
-        </div>
-      </div>
-
-      <!-- Panel: Crypto Market Radar Signals -->
-      <section class="panel">
-        <div class="panel-header">
+      <!-- Left Column: Agent Hub (Avatar + Dialogue + Control) -->
+      <section class="panel agent-hub">
+        <div class="panel-header" style="width: 100%;">
           <div class="panel-title">
-            <span>📡</span> Radar Sinyal Crypto Terdeteksi
+            <span>🛡️</span> Gladius Aquila (AI Agent)
           </div>
         </div>
-        <div id="signalsContainer" class="signals-grid">
-          <div class="empty-state">Belum ada sinyal terdeteksi pada radar. Tekan 'Pindai Radar Sekarang'.</div>
+
+        <!-- Cybernetic Eagle Avatar Visual -->
+        <div class="avatar-container">
+          <div class="avatar-ring"></div>
+          <div class="avatar-ring-2"></div>
+
+          <div id="eagleGraphic" class="avatar-graphic">
+            <!-- Cyber Eagle SVG Artwork -->
+            <svg class="eagle-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="armorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#0284c7" />
+                </linearGradient>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fde047" />
+                  <stop offset="100%" stop-color="#eab308" />
+                </linearGradient>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Cybernetic Crest Feathers (Helmet / Crown) -->
+              <path d="M50 8 L54 22 L62 14 L58 28 L70 24 L62 36 L50 26 L38 36 L30 24 L42 28 L38 14 L46 22 Z" fill="url(#goldGrad)" filter="url(#glow)" />
+
+              <!-- Head Armor / Titanium Plating -->
+              <path d="M50 25 C65 25 74 35 72 52 C70 65 62 72 50 82 C38 72 30 65 28 52 C26 35 35 25 50 25 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+
+              <!-- Cyber Visor / Tactical Optics (Cyan Glow) -->
+              <path d="M35 44 Q50 48 65 44 L63 52 Q50 56 37 52 Z" fill="#00f0ff" opacity="0.9" filter="url(#glow)" />
+
+              <!-- Eagle Eyes (Glowing Amber/Red Optics) -->
+              <polygon points="41,46 47,48 43,50" fill="#ffffff" />
+              <polygon points="59,46 53,48 57,50" fill="#ffffff" />
+              <circle cx="44" cy="48" r="1.5" fill="#ef4444" filter="url(#glow)" />
+              <circle cx="56" cy="48" r="1.5" fill="#ef4444" filter="url(#glow)" />
+
+              <!-- Golden Sharp Beak (Apex Predator) -->
+              <path d="M46 54 Q50 55 54 54 L52 74 Q50 82 48 74 Z" fill="url(#goldGrad)" stroke="#ca8a04" stroke-width="0.75" />
+
+              <!-- Neck Tactical Collar Plates -->
+              <path d="M32 68 L50 85 L68 68 L72 82 L50 96 L28 82 Z" fill="#0f172a" stroke="url(#armorGrad)" stroke-width="1.2" />
+              <line x1="50" y1="85" x2="50" y2="96" stroke="#00f0ff" stroke-width="1.5" filter="url(#glow)" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="agent-badge-tag">ELITE RESEARCH OPERATOR</div>
+
+        <!-- Speech Bubble -->
+        <div class="speech-bubble">
+          <div class="speech-speaker">
+            <span>🦅</span> Gladius Aquila:
+          </div>
+          <div id="speechText">
+            Boss, Gladius Aquila standby di Tactical Command Center. Siap memindai radar pasar crypto dan berita ekonomi XAUUSD.
+          </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="action-grid">
+          <button id="btnScanNow" class="btn btn-primary">
+            <span>🚀</span> Pindai Radar Sekarang
+          </button>
+          <button id="btnTogglePatrol" class="btn btn-patrol">
+            <span>🛡️</span> Aktifkan Patroli 24 Jam
+          </button>
+          <button id="btnTestTelegram" class="btn btn-telegram">
+            <span>📲</span> Tes Notifikasi Telegram
+          </button>
         </div>
       </section>
 
-      <!-- Panel: XAUUSD Economic Calendar & News Bias -->
+      <!-- Right Column: Telemetry, Signals, News, Logs -->
+      <div class="content-area">
+
+        <!-- Metrics Strip -->
+        <div class="metrics-strip">
+          <div class="metric-card">
+            <div class="metric-label">Total Siklus</div>
+            <div id="cycleCount" class="metric-value">#0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Waktu Scan Terakhir</div>
+            <div id="lastScanTime" class="metric-value">--:--:--</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Harga Emas Proksi (PAXG)</div>
+            <div id="goldPrice" class="metric-value" style="color: var(--gold-neon);">$---</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Sinyal 24 Jam</div>
+            <div id="signal24hCount" class="metric-value">--</div>
+          </div>
+        </div>
+
+        <!-- Panel: Crypto Market Radar Signals -->
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>📡</span> Radar Sinyal Crypto Terdeteksi
+            </div>
+            <div class="panel-actions">
+              <select id="signalTypeFilter" class="filter-select">
+                <option value="">Semua Tipe</option>
+                <option value="HIGH_VOLUME">High Volume</option>
+                <option value="STRONG_MOMENTUM">Momentum Kuat</option>
+                <option value="EXHAUSTION">Exhaustion</option>
+              </select>
+            </div>
+          </div>
+          <div id="signalsContainer" class="signals-grid">
+            <div class="empty-state">Belum ada sinyal terdeteksi pada radar. Tekan 'Pindai Radar Sekarang'.</div>
+          </div>
+        </section>
+
+        <!-- Panel: XAUUSD Economic Calendar & News Bias -->
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>🪙</span> Kalender &amp; Bias Berita XAUUSD (Gold)
+            </div>
+          </div>
+          <div id="goldEventsContainer" class="events-list">
+            <div class="empty-state">Memuat jadwal kalender ekonomi...</div>
+          </div>
+        </section>
+
+        <!-- Panel: Live Tactical Terminal Logs -->
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>💻</span> Live Tactical Log Terminal
+            </div>
+          </div>
+          <div id="terminalLogs" class="terminal">
+            <div class="log-line">
+              <span class="log-time">[Init]</span>
+              <span class="log-level-INFO">INFO</span>
+              <span class="log-msg">Tactical Command Center siap menerima perintah Boss.</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== TAB: RIWAYAT SINYAL ===== -->
+  <div id="tab-history" class="tab-content">
+    <div class="tab-panel-wrapper">
+      <div class="tab-toolbar">
+        <div class="toolbar-group">
+          <label class="toolbar-label">Rentang Waktu:</label>
+          <select id="historyHours" class="filter-select">
+            <option value="6">6 Jam</option>
+            <option value="24" selected>24 Jam</option>
+            <option value="48">48 Jam</option>
+            <option value="168">7 Hari</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <label class="toolbar-label">Tipe Sinyal:</label>
+          <select id="historyTypeFilter" class="filter-select">
+            <option value="">Semua Tipe</option>
+            <option value="HIGH_VOLUME">High Volume</option>
+            <option value="STRONG_MOMENTUM">Momentum Kuat</option>
+            <option value="EXHAUSTION">Exhaustion</option>
+          </select>
+        </div>
+        <button id="btnLoadHistory" class="btn btn-primary" style="width:auto;padding:0.5rem 1rem;">
+          <span>🔍</span> Muat Riwayat
+        </button>
+      </div>
+
+      <!-- Stats strip -->
+      <div id="historyStats" class="history-stats"></div>
+
+      <!-- History Table -->
       <section class="panel">
         <div class="panel-header">
-          <div class="panel-title">
-            <span>🪙</span> Kalender & Bias Berita XAUUSD (Gold)
-          </div>
+          <div class="panel-title"><span>📜</span> Riwayat Sinyal Tersimpan</div>
+          <div id="historyCount" class="metric-value" style="font-size:0.9rem;"></div>
         </div>
-        <div id="goldEventsContainer" class="events-list">
-          <div class="empty-state">Memuat jadwal kalender ekonomi...</div>
-        </div>
-      </section>
-
-      <!-- Panel: Live Tactical Terminal Logs -->
-      <section class="panel">
-        <div class="panel-header">
-          <div class="panel-title">
-            <span>💻</span> Live Tactical Log Terminal
-          </div>
-        </div>
-        <div id="terminalLogs" class="terminal">
-          <div class="log-line">
-            <span class="log-time">[Init]</span>
-            <span class="log-level-INFO">INFO</span>
-            <span class="log-msg">Tactical Command Center siap menerima perintah Boss.</span>
-          </div>
+        <div id="historyTableContainer">
+          <div class="empty-state">Tekan 'Muat Riwayat' untuk melihat sinyal historis dari database.</div>
         </div>
       </section>
-
     </div>
+  </div>
 
-  </main>
+  <!-- ===== TAB: FUNDING RATE ===== -->
+  <div id="tab-futures" class="tab-content">
+    <div class="tab-panel-wrapper">
+      <div class="tab-toolbar">
+        <div class="toolbar-group">
+          <label class="toolbar-label">Jumlah Top:</label>
+          <select id="futuresTopN" class="filter-select">
+            <option value="5">Top 5</option>
+            <option value="10" selected>Top 10</option>
+            <option value="20">Top 20</option>
+          </select>
+        </div>
+        <button id="btnLoadFutures" class="btn btn-primary" style="width:auto;padding:0.5rem 1rem;">
+          <span>⚡</span> Muat Data Funding
+        </button>
+      </div>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span>⚡</span> Funding Rate &amp; Open Interest Futures</div>
+          <div class="panel-subtitle" style="font-size:0.75rem;color:var(--text-dim);">
+            Funding rate tinggi (+) = pasar overextended long. Negatif = short dominan.
+          </div>
+        </div>
+        <div id="futuresContainer">
+          <div class="empty-state">Tekan 'Muat Data Funding' untuk melihat funding rate crypto futures.</div>
+        </div>
+      </section>
+
+      <div class="disclaimer-box">
+        ⚠️ Data funding rate adalah informasi pasar, bukan sinyal entry. Gunakan sebagai konteks sentimen saja.
+      </div>
+    </div>
+  </div>
 
   <script src="/static/js/dashboard.js"></script>
 </body>
