@@ -1,0 +1,20 @@
+# Rahasia — JANGAN pernah di-commit
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Log & cache lokal
+logs/
+*.log
+.cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store

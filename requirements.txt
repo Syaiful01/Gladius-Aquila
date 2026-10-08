@@ -1,0 +1,12 @@
+# Notifikasi Telegram (async API, v21+)
+python-telegram-bot>=21.0,<23.0
+# Membaca file .env
+python-dotenv>=1.0.0
+# Data crypto dari exchange publik (Binance/Bybit)
+ccxt>=4.3.0
+# HTTP untuk CoinGecko & kalender ekonomi
+requests>=2.31.0
+# Perhitungan indikator (RSI/EMA) & olah OHLCV
+pandas>=2.0.0
+# Database zona waktu (wajib di Windows, aman di Linux/macOS)
+tzdata>=2024.1
